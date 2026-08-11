@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+  <script>
+      if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+      } else {
+          document.documentElement.classList.remove('dark');
+      }
+  </script>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Threat Analysis Results - SentraShield</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries,typography"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#137fec",
+            "background-light": "#f6f7f8",
+            "background-dark": "#101922",
+            "warning": "#f59e0b",
+            "danger": "#ef4444",
+            "success": "#10b981"
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      scroll-behavior: smooth;
+    }
+
+    /* Custom Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    .animate-slide-up {
+      animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+      /* meaningful initial state */
+    }
+
+    .animate-scale-in {
+      animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+    }
+
+    .delay-100 {
+      animation-delay: 0.1s;
+    }
+
+    .delay-200 {
+      animation-delay: 0.2s;
+    }
+
+    .delay-300 {
+      animation-delay: 0.3s;
+    }
+
+    .delay-400 {
+      animation-delay: 0.4s;
+    }
+
+    .delay-500 {
+      animation-delay: 0.5s;
+    }
+
+    /* Hover effects */
+    .hover-lift {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hover-lift:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark min-h-screen text-[#111418] dark:text-gray-100">
+  <div class="relative flex h-auto w-full flex-col group/design-root overflow-x-hidden">
+    <div class="layout-container flex h-full grow flex-col">
+      <!-- Top Navigation Bar -->
+      <header
+        class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#dbe0e6] dark:border-gray-800 bg-white dark:bg-gray-900 px-6 md:px-40 py-3">
+        <div class="flex items-center gap-4">
+          <div class="size-6 text-primary">
+            <svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z"
+                fill="currentColor"></path>
+            </svg>
+          </div>
+          <h2 class="text-lg font-bold leading-tight tracking-tight">SentraShield</h2>
+        </div>
+        <div class="flex flex-1 justify-end gap-8 items-center">
+          <nav class="hidden md:flex items-center gap-9">
+            <a class="text-sm font-medium hover:text-primary transition-colors"
+              href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a class="text-sm font-medium hover:text-primary transition-colors" href="{{ url_for('dashboard') }}">Scan
+              History</a>
+          </nav>
+          <button id="theme-toggle" type="button" class="text-[#617589] dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 flex items-center justify-center">
+              <span id="theme-toggle-dark-icon" class="hidden material-symbols-outlined">dark_mode</span>
+              <span id="theme-toggle-light-icon" class="hidden material-symbols-outlined">light_mode</span>
+          </button>
+        </div>
+      </header>
+      <main class="px-4 md:px-40 flex flex-1 justify-center py-8">
+        <div class="layout-content-container flex flex-col max-w-[960px] flex-1 gap-6">
+          {% if not analysis %}
+          <div class="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-[#dbe0e6] dark:border-gray-800">
+            <h1 class="text-xl font-bold mb-2">No analysis found</h1>
+            <p class="text-sm text-[#617589] dark:text-gray-400 mb-4">This result link is no longer available. Run a new
+              scan from the homepage.</p>
+            <a href="{{ url_for('index') }}"
+              class="inline-flex items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-colors">Back
+              to scanner</a>
+          </div>
+          {% else %}
+          <!-- Breadcrumbs -->
+          <div class="flex items-center gap-2 text-sm">
+            <a class="text-[#617589] hover:text-primary font-medium" href="{{ url_for('index') }}">New Scan</a>
+            <span class="text-[#617589] font-medium">/</span>
+            <span class="text-[#111418] dark:text-white font-medium">Detailed Result</span>
+          </div>
+          <!-- Profile/Threat Header -->
+          <div
+            class="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-[#dbe0e6] dark:border-gray-800 animate-scale-in">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div class="flex gap-5 items-start">
+                <div
+                  class="{{ color_class }} flex items-center justify-center rounded-xl min-h-[80px] w-20 shrink-0 transition-colors duration-300">
+                  <span class="material-symbols-outlined !text-4xl">{{ icon_name }}</span>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <div class="flex items-center gap-3">
+                    <h1 class="text-2xl font-bold tracking-tight">
+                      {% if analysis.kind == "url" %}
+                      URL scan
+                      {% elif analysis.kind == "email" %}
+                      Email scan
+                      {% elif analysis.kind == "phone" %}
+                      Phone number scan
+                      {% elif analysis.kind == "message" %}
+                      Message scan
+                      {% elif analysis.kind == "domain" %}
+                      Domain scan
+                      {% else %}
+                      Threat analysis
+                      {% endif %}
+                    </h1>
+                    {% if risk_label %}
+                    <span
+                      class="{{ color_class.split(' ')[0].replace('/30', '/20') }} {{ color_class.split(' ')[1] }} px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                      {{ risk_label }}
+                    </span>
+                    {% endif %}
+                  </div>
+                  {% if input_text_value %}
+                  <p class="text-[#617589] dark:text-gray-400 text-base">Scanned input: <span
+                      class="font-mono text-sm break-all">{{ input_text_value }}</span></p>
+                  {% elif analysis.url and analysis.url.url %}
+                  <p class="text-[#617589] dark:text-gray-400 text-base">URL: <span
+                      class="font-mono text-sm break-all">{{ analysis.url.url }}</span></p>
+                  {% endif %}
+                  <p class="text-[#617589] dark:text-gray-400 text-sm flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">schedule</span>
+                    Analysis generated recently from this browser session
+                  </p>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <a href="{{ url_for('index') }}"
+                  class="flex flex-1 md:flex-none items-center justify-center rounded-lg h-11 px-6 bg-primary text-white text-sm font-bold shadow-sm hover:bg-primary/90 transition-colors">
+                  New scan
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- Stats Row -->
+          {% if analysis.kind == 'phone' %}
+          <!-- Phone Intelligence Row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 shadow-sm hover-lift animate-slide-up delay-100">
+              <p class="text-[#617589] dark:text-gray-400 text-sm font-medium">Search Intelligence</p>
+              <p class="text-[#111418] dark:text-white text-3xl font-bold">
+                {{ analysis.phone.results_found or 0 }} matches
+              </p>
+              <p class="text-[#617589] text-sm font-medium flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">public</span>
+                Found in public records/scam reports
+              </p>
+            </div>
+            <div
+              class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 shadow-sm hover-lift animate-slide-up delay-200">
+              <p class="text-[#617589] dark:text-gray-400 text-sm font-medium">AI Analysis</p>
+              <p class="text-[#111418] dark:text-white text-3xl font-bold">
+                {{ risk_label or "Processing" }}
+              </p>
+              <p
+                class="{{ color_class.split(' ')[1] }} {{ color_class.split(' ')[3] }} text-sm font-medium flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">psychology</span>
+                Generative verdict
+              </p>
+            </div>
+          </div>
+          {% elif analysis.kind == 'message' %}
+          <!-- Message Intelligence Row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 shadow-sm hover-lift animate-slide-up delay-100">
+              <p class="text-[#617589] dark:text-gray-400 text-sm font-medium">Text Analysis</p>
+              <p class="text-[#111418] dark:text-white text-3xl font-bold">
+                {{ analysis.message.text_assessment.risk_level if analysis.message and analysis.message.text_assessment
+                else 'Unknown' }}
+              </p>
+              <p class="text-[#617589] text-sm font-medium flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">text_fields</span>
+                {{ analysis.message.text_assessment.reason if analysis.message and analysis.message.text_assessment else
+                'No text content' }}
+              </p>
+            </div>
+            <div
+              class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 shadow-sm hover-lift animate-slide-up delay-200">
+              <p class="text-[#617589] dark:text-gray-400 text-sm font-medium">Link Safety</p>
+              <p class="text-[#111418] dark:text-white text-3xl font-bold">
+                {% set ns = namespace(suspicious_links=0) %}
+                {% if analysis.message and analysis.message.url_results %}
+                {% for res in analysis.message.url_results %}
+                {% if res.risk_level in ['High', 'Suspicious', 'Malicious'] %}
+                {% set ns.suspicious_links = ns.suspicious_links + 1 %}
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+                {{ ns.suspicious_links }} suspicious
+              </p>
+              <p class="text-danger text-sm font-medium flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">link</span>
+                {{ analysis.message.urls|length if analysis.message and analysis.message.urls else 0 }} links found
+              </p>
+            </div>
+          </div>
+          {% else %}
+          <!-- Generic Stats Row -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div
+              class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 shadow-sm hover-lift animate-slide-up delay-100">
+              <p class="text-[#617589] dark:text-gray-400 text-sm font-medium">Risk Score</p>
+              <div class="flex items-baseline gap-2">
+                <p class="{{ color_class.split(' ')[1] }} {{ color_class.split(' ')[3] }} text-3xl font-bold">
+                  {% if analysis.domain_risk and analysis.domain_risk.risk_score is not none %}
+                  {{ analysis.domain_risk.risk_score }}
+                  {% else %}
+                  --
+                  {% endif %}
+                </p>
+                <p class="text-[#617589] text-lg font-medium">/ 100</p>
+              </div>
+              <p
+                class="{{ color_class.split(' ')[1] }} {{ color_class.split(' ')[3] }} text-sm font-medium flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">trending_up</span>
+                <!-- You might want to flip this icon for 'Safe' -->
+                {% if risk_label %}
+                {{ risk_label }}
+                {% else %}
+                No overall label
+                {% endif %}
+              </p>
+            </div>
+            <div
+              class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 shadow-sm hover-lift animate-slide-up delay-200">
+              <p class="text-[#617589] dark:text-gray-400 text-sm font-medium">Detection Engines</p>
+              <p class="text-[#111418] dark:text-white text-3xl font-bold">
+                {% if analysis.url and analysis.url.stats %}
+                {{ (analysis.url.stats.malicious or 0) + (analysis.url.stats.suspicious or 0) }} flagged
+                {% else %}
+                --
+                {% endif %}
+              </p>
+              <p class="text-danger text-sm font-medium flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">gpp_maybe</span>
+                {% if analysis.url and analysis.url.risk_level %}
+                URL risk: {{ analysis.url.risk_level }}
+                {% else %}
+                No URL verdict available
+                {% endif %}
+              </p>
+            </div>
+            <div
+              class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 shadow-sm hover-lift animate-slide-up delay-300">
+              <p class="text-[#617589] dark:text-gray-400 text-sm font-medium">Domain Trust</p>
+              <p class="text-[#111418] dark:text-white text-3xl font-bold">
+                {% if analysis.domain_risk and analysis.domain_risk.verdict %}
+                {{ analysis.domain_risk.verdict }}
+                {% else %}
+                Unknown
+                {% endif %}
+              </p>
+              {% if analysis.domain_risk and analysis.domain_risk.signals %}
+              <p class="text-[#617589] dark:text-gray-400 text-sm font-medium italic">
+                {{ analysis.domain_risk.signals[0] }}
+              </p>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+          <!-- AI Summary Card -->
+          <div
+            class="flex flex-col overflow-hidden rounded-xl bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 shadow-sm animate-fade-in delay-400">
+            <div class="p-6 md:p-8 flex flex-col md:flex-row gap-8">
+
+              <div class="flex-1 flex flex-col gap-4">
+                <div class="flex items-center gap-2 text-primary">
+                  <span class="material-symbols-outlined">psychology</span>
+                  <h3 class="text-lg font-bold">Plain English Summary</h3>
+                </div>
+                {% set url_summary = analysis.get('url', {}).get('llm_summary') %}
+                {% set domain_summary = analysis.get('domain_risk', {}).get('llm_summary') %}
+                {% set email_summary = analysis.get('email', {}).get('llm_summary') %}
+                {% set message_summary = analysis.get('message', {}).get('llm_summary') %}
+                {% set phone_summary = analysis.get('phone', {}).get('llm_summary') %}
+                <div id="raw-summary" style="display:none;">{{ url_summary or domain_summary or email_summary or
+                  message_summary or phone_summary or "No AI summary is available for this scan." }}</div>
+                  
+                <div id="ai-loading" class="flex items-center gap-2 text-primary font-medium p-4 bg-primary/5 rounded-xl border border-primary/20 w-max">
+                  <span class="material-symbols-outlined animate-spin">autorenew</span>
+                  <span>AI is formulating insights</span>
+                  <div class="flex items-end h-full mb-1 gap-1 ml-1">
+                    <div class="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"></div>
+                    <div class="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style="animation-delay: 0.15s"></div>
+                    <div class="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+                  </div>
+                </div>
+
+                <div id="ai-summary"
+                  class="hidden prose prose-base prose-slate dark:prose-invert max-w-none prose-p:leading-relaxed prose-a:text-primary hover:prose-a:text-primary/80 prose-strong:text-[#111418] dark:prose-strong:text-white break-words"></div>
+                
+                <style>
+                  .typing-cursor::after {
+                    content: '▋';
+                    animation: blink 1s step-end infinite;
+                    color: #137fec;
+                    margin-left: 4px;
+                    vertical-align: baseline;
+                  }
+                  @keyframes blink { 50% { opacity: 0; } }
+                </style>
+
+                <script>
+                  document.addEventListener('DOMContentLoaded', function () {
+                    const rawSummary = document.getElementById('raw-summary').textContent.trim();
+                    const aiSummaryEl = document.getElementById('ai-summary');
+                    const aiLoadingEl = document.getElementById('ai-loading');
+                    
+                    const parsedHTML = marked.parse(rawSummary);
+                    
+                    setTimeout(() => {
+                        aiLoadingEl.classList.add('hidden');
+                        aiSummaryEl.classList.remove('hidden');
+                        aiSummaryEl.classList.add('typing-cursor');
+                        
+                        typeHTML(aiSummaryEl, parsedHTML, 10).then(() => {
+                            aiSummaryEl.classList.remove('typing-cursor');
+                        });
+                    }, 1500);
+
+                    function typeHTML(element, htmlString, speed) {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = htmlString;
+                        element.innerHTML = '';
+                        
+                        function appendNode(node, parent) {
+                            return new Promise(async (resolve) => {
+                                if (node.nodeType === Node.TEXT_NODE) {
+                                    const text = node.textContent;
+                                    const textNode = document.createTextNode('');
+                                    parent.appendChild(textNode);
+                                    
+                                    for (let i = 0; i < text.length; i++) {
+                                        textNode.textContent += text[i];
+                                        
+                                        let delay = speed;
+                                        if (['.', '!', '?'].includes(text[i])) delay = speed * 15;
+                                        else if ([',', ';'].includes(text[i])) delay = speed * 8;
+                                        else if (text[i] === ' ') delay = speed * 2;
+                                        
+                                        await new Promise(r => setTimeout(r, delay));
+                                    }
+                                    resolve();
+                                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                                    const el = document.createElement(node.tagName);
+                                    for (let attr of node.attributes) {
+                                        el.setAttribute(attr.name, attr.value);
+                                    }
+                                    parent.appendChild(el);
+                                    
+                                    for (let child of node.childNodes) {
+                                        await appendNode(child, el);
+                                    }
+                                    resolve();
+                                } else {
+                                    resolve();
+                                }
+                            });
+                        }
+                        
+                        return (async () => {
+                            for (let child of tempDiv.childNodes) {
+                                await appendNode(child, element);
+                            }
+                        })();
+                    }
+                  });
+                </script>
+                <div class="bg-primary/5 p-4 rounded-lg border border-primary/20 mt-2">
+                  <p class="text-sm text-primary font-medium">Use this result as guidance only. When in doubt, avoid
+                    clicking links or sharing information.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Key Findings List -->
+          <div
+            class="bg-white dark:bg-gray-900 rounded-xl p-6 border border-[#dbe0e6] dark:border-gray-800 shadow-sm animate-fade-in delay-500">
+            <h3 class="text-base font-bold mb-4">Key Findings</h3>
+            <ul class="space-y-4">
+              {% if analysis.domain_risk and analysis.domain_risk.signals %}
+              {% for reason in analysis.domain_risk.signals %}
+              <li class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-warning mt-0.5">error</span>
+                <div>
+                  <p class="text-sm font-semibold">{{ reason }}</p>
+                </div>
+              </li>
+              {% endfor %}
+
+              <!-- DMARC Warnings -->
+              {% if analysis.email and analysis.email.dmarc %}
+              {% if not analysis.email.dmarc.has_dmarc %}
+              <li class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-danger mt-0.5">lock_open</span>
+                <div>
+                  <p class="text-sm font-semibold">No DMARC Record Found</p>
+                  <p class="text-xs text-[#617589]">This domain is vulnerable to email spoofing.</p>
+                </div>
+              </li>
+              {% elif analysis.email.dmarc.policy == 'none' %}
+              <li class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-warning mt-0.5">warning</span>
+                <div>
+                  <p class="text-sm font-semibold">DMARC Policy is 'None'</p>
+                  <p class="text-xs text-[#617589]">No enforcement against unauthorized senders.</p>
+                </div>
+              </li>
+              {% endif %}
+              {% endif %}
+
+              {% elif analysis.message and analysis.message.text_assessment and analysis.message.text_assessment.reason
+              %}
+              <li class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-warning mt-0.5">error</span>
+                <div>
+                  <p class="text-sm font-semibold">{{ analysis.message.text_assessment.reason }}</p>
+                </div>
+              </li>
+              {% elif analysis.kind == 'phone' and analysis.phone.references %}
+              {% for ref in analysis.phone.references[:3] %}
+              <li class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-warning mt-0.5">public</span>
+                <div>
+                  <p class="text-sm font-semibold hover:underline"><a href="{{ ref.url }}" target="_blank">{{ ref.title
+                      }}</a></p>
+                  <p class="text-xs text-[#617589] line-clamp-2">{{ ref.description }}</p>
+                </div>
+              </li>
+              {% endfor %}
+              {% elif analysis.email and analysis.email.text_assessment and analysis.email.text_assessment.reason %}
+              <li class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-warning mt-0.5">error</span>
+                <div>
+                  <p class="text-sm font-semibold">{{ analysis.email.text_assessment.reason }}</p>
+                </div>
+              </li>
+              {% else %}
+              <li class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-success mt-0.5">verified_user</span>
+                <div>
+                  <p class="text-sm font-semibold">No detailed findings available</p>
+                  <p class="text-xs text-[#617589]">Run another scan or provide more context for deeper analysis.</p>
+                </div>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+          <!-- Collapsible Technical Details -->
+          <div
+            class="border border-[#dbe0e6] dark:border-gray-800 rounded-xl bg-white dark:bg-gray-900 overflow-hidden">
+            <button
+              class="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[#617589]">terminal</span>
+                <span class="font-bold text-sm">Technical Details</span>
+              </div>
+              <span class="material-symbols-outlined text-[#617589]">expand_more</span>
+            </button>
+            <div class="p-6 border-t border-[#dbe0e6] dark:border-gray-800 bg-[#fbfcfd] dark:bg-gray-950/50">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-mono text-xs">
+                <div class="space-y-2">
+                  <p class="text-[#617589] font-sans uppercase tracking-widest font-bold">Domain Information</p>
+                  {% if analysis.domain_risk %}
+                  <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-1">
+                    <span class="text-[#617589]">Domain:</span>
+                    <span>{{ analysis.domain_risk.domain }}</span>
+                  </div>
+                  <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-1">
+                    <span class="text-[#617589]">Verdict:</span>
+                    <span>{{ analysis.domain_risk.verdict }}</span>
+                  </div>
+                  {% elif analysis.kind == 'phone' %}
+                  <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-1">
+                    <span class="text-[#617589]">Number:</span>
+                    <span>{{ analysis.phone.phone_number }}</span>
+                  </div>
+                  <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-1">
+                    <span class="text-[#617589]">Matches:</span>
+                    <span>{{ analysis.phone.results_found }}</span>
+                  </div>
+                  <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-1">
+                    <span class="text-[#617589]">Risk:</span>
+                    <span>{{ analysis.phone.risk_level }}</span>
+                  </div>
+                  {% elif analysis.kind == 'message' %}
+                  <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-1">
+                    <span class="text-[#617589]">Risk Score:</span>
+                    <span>{{ analysis.message.text_assessment.reason }}</span>
+                  </div>
+                  <div class="flex flex-col gap-2 mt-2">
+                    <span class="text-[#617589] text-xs font-bold uppercase">Extracted URLs</span>
+                    {% if analysis.message.urls %}
+                    {% for url in analysis.message.urls %}
+                    <div class="flex justify-between border-b border-gray-50 dark:border-gray-800 pb-1 text-[10px]">
+                      <span class="truncate max-w-[150px]">{{ url }}</span>
+                      <!-- We could lookup the risk if we mapped it, but for now just showing existence -->
+                      <span class="text-[#617589]">Detected</span>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <span class="text-xs text-gray-500 italic">No URLs found in message</span>
+                    {% endif %}
+                  </div>
+                  {% else %}
+                  <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-1">
+                    <span class="text-[#617589]">Domain:</span>
+                    <span>Not available</span>
+                  </div>
+                  {% endif %}
+
+                  <!-- DMARC Technical Details -->
+                  {% if analysis.email and analysis.email.dmarc %}
+                  <div class="mt-4 space-y-2">
+                    <p class="text-[#617589] font-sans uppercase tracking-widest font-bold">Authentication (DMARC)</p>
+                    <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-1">
+                      <span class="text-[#617589]">Status:</span>
+                      <span class="{{ 'text-success' if analysis.email.dmarc.has_dmarc else 'text-danger' }}">
+                        {{ 'Found' if analysis.email.dmarc.has_dmarc else 'Missing' }}
+                      </span>
+                    </div>
+                    {% if analysis.email.dmarc.has_dmarc %}
+                    <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-1">
+                      <span class="text-[#617589]">Policy:</span>
+                      <span class="uppercase font-bold">{{ analysis.email.dmarc.policy or 'Unknown' }}</span>
+                    </div>
+                    <div class="flex flex-col gap-1 mt-1">
+                      <span class="text-[#617589]">Raw Record:</span>
+                      <code
+                        class="text-[10px] bg-gray-100 dark:bg-gray-800 p-1 rounded break-all">{{ analysis.email.dmarc.record }}</code>
+                    </div>
+                    {% endif %}
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="space-y-2">
+                  <p class="text-[#617589] font-sans uppercase tracking-widest font-bold">Detection Breakdown</p>
+                  {% if analysis.url and analysis.url.stats %}
+                  <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-1">
+                    <span class="text-[#617589]">Malicious:</span>
+                    <span class="text-danger">{{ analysis.url.stats.malicious or 0 }}</span>
+                  </div>
+                  <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-1">
+                    <span class="text-[#617589]">Suspicious:</span>
+                    <span class="text-warning">{{ analysis.url.stats.suspicious or 0 }}</span>
+                  </div>
+                  <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-1">
+                    <span class="text-[#617589]">Harmless:</span>
+                    <span>{{ analysis.url.stats.harmless or 0 }}</span>
+                  </div>
+                  {% elif analysis.kind == 'phone' %}
+                  <div class="flex flex-col gap-1">
+                    <span class="text-[#617589] text-[10px] uppercase">Search Variants Checked</span>
+                    {% for variant in analysis.phone.variants %}
+                    <span class="text-xs font-mono text-gray-500">{{ variant }}</span>
+                    {% endfor %}
+                  </div>
+                  {% else %}
+                  <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-1">
+                    <span class="text-[#617589]">Details:</span>
+                    <span>No VirusTotal stats available</span>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      {% endif %}
+      <!-- Footer -->
+      <footer class="mt-auto px-40 py-10 border-t border-[#dbe0e6] dark:border-gray-800 bg-white dark:bg-gray-900">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+          <p class="text-[#617589] text-sm font-medium">© 2026 SentraShield. Secure Browsing Assistant.</p>
+        </div>
+      </footer>
+    </div>
+  </div>
+    <script>
+        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        var themeToggleBtn = document.getElementById('theme-toggle');
+
+        if(themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', function() {
+                themeToggleDarkIcon.classList.toggle('hidden');
+                themeToggleLightIcon.classList.toggle('hidden');
+
+                if (localStorage.getItem('color-theme')) {
+                    if (localStorage.getItem('color-theme') === 'light') {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('color-theme', 'dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('color-theme', 'light');
+                    }
+                } else {
+                    if (document.documentElement.classList.contains('dark')) {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('color-theme', 'light');
+                    } else {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('color-theme', 'dark');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

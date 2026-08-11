@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <script>
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Dashboard - SentraShield</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Custom Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        .delay-100 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-200 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+
+        .hover-lift {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-[#111418] dark:text-white transition-colors duration-300">
+    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+        <div class="layout-container flex h-full grow flex-col">
+            <!-- Navigation Header -->
+            <header
+                class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#dbe0e6] dark:border-gray-800 px-6 md:px-20 lg:px-40 py-4 bg-white dark:bg-background-dark sticky top-0 z-50">
+                <div class="flex items-center gap-3 text-[#111418] dark:text-white">
+                    <a href="{{ url_for('index') }}" class="flex items-center gap-3">
+                        <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+                            <span class="material-symbols-outlined">shield_lock</span>
+                        </div>
+                        <h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">SentraShield</h2>
+                    </a>
+                </div>
+                <div class="flex flex-1 justify-end gap-8 items-center">
+                    <div class="hidden md:flex items-center gap-8">
+                        <a class="text-sm font-medium hover:text-primary transition-colors text-primary"
+                            href="{{ url_for('dashboard') }}">Dashboard</a>
+                        <a class="text-sm font-medium hover:text-primary transition-colors"
+                            href="{{ url_for('features') }}">Features</a>
+                        <a class="text-sm font-medium hover:text-primary transition-colors"
+                            href="{{ url_for('how_it_works') }}">How it Works</a>
+                    </div>
+                    <button id="theme-toggle" type="button" class="text-[#617589] dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 flex items-center justify-center">
+                        <span id="theme-toggle-dark-icon" class="hidden material-symbols-outlined">dark_mode</span>
+                        <span id="theme-toggle-light-icon" class="hidden material-symbols-outlined">light_mode</span>
+                    </button>
+                </div>
+            </header>
+
+            <main class="flex-1 px-4 md:px-20 lg:px-40 py-10 flex justify-center">
+                <div class="layout-content-container flex flex-col max-w-[960px] flex-1 gap-8 animate-slide-up">
+
+                    <!-- Header -->
+                    <div class="flex flex-col gap-2">
+                        <h1 class="text-3xl font-bold text-[#111418] dark:text-white">Security Command Center</h1>
+                        <p class="text-[#617589] dark:text-gray-400">Overview of your current session's security
+                            posture.</p>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Total Scans -->
+                        <div
+                            class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 shadow-sm hover-lift">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-[#617589] dark:text-gray-400 font-medium">Total Scans</span>
+                                <div
+                                    class="size-10 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-lg flex items-center justify-center">
+                                    <span class="material-symbols-outlined">radar</span>
+                                </div>
+                            </div>
+                            <div class="text-4xl font-black text-[#111418] dark:text-white">{{ total_scans }}</div>
+                            <p class="text-xs text-[#617589] dark:text-gray-400 mt-2">Analyzed this session</p>
+                        </div>
+
+                        <!-- Threats Blocked -->
+                        <div
+                            class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 shadow-sm hover-lift">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-[#617589] dark:text-gray-400 font-medium">Threats Detected</span>
+                                <div
+                                    class="size-10 bg-red-100 dark:bg-red-900/30 text-red-600 rounded-lg flex items-center justify-center">
+                                    <span class="material-symbols-outlined">warning</span>
+                                </div>
+                            </div>
+                            <div class="text-4xl font-black text-[#111418] dark:text-white">{{ threat_count }}</div>
+                            <p class="text-xs text-[#617589] dark:text-gray-400 mt-2">Potential risks identified</p>
+                        </div>
+
+                        <!-- Safe Scans -->
+                        <div
+                            class="p-6 rounded-2xl bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 shadow-sm hover-lift">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-[#617589] dark:text-gray-400 font-medium">Safe Items</span>
+                                <div
+                                    class="size-10 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-lg flex items-center justify-center">
+                                    <span class="material-symbols-outlined">verified_user</span>
+                                </div>
+                            </div>
+                            <div class="text-4xl font-black text-[#111418] dark:text-white">{{ safe_count }}</div>
+                            <p class="text-xs text-[#617589] dark:text-gray-400 mt-2">Confirmed safe inputs</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Quick Actions -->
+                        <div class="lg:col-span-1 flex flex-col gap-4">
+                            <h2 class="text-lg font-bold text-[#111418] dark:text-white">Quick Actions</h2>
+                            <div
+                                class="bg-white dark:bg-gray-900 rounded-2xl border border-[#dbe0e6] dark:border-gray-800 p-4 flex flex-col gap-3">
+                                <a href="{{ url_for('index') }}"
+                                    class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group">
+                                    <div
+                                        class="size-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+                                        <span class="material-symbols-outlined">link</span>
+                                    </div>
+                                    <div class="font-medium text-[#111418] dark:text-white">Scan a URL</div>
+                                </a>
+                                <a href="{{ url_for('index') }}"
+                                    class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group">
+                                    <div
+                                        class="size-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+                                        <span class="material-symbols-outlined">qr_code_scanner</span>
+                                    </div>
+                                    <div class="font-medium text-[#111418] dark:text-white">Scan Image/QR</div>
+                                </a>
+                                <form action="{{ url_for('clear_history') }}" method="post"
+                                    onsubmit="return confirm('Clear all session history?');"
+                                    class="mt-2 pt-4 border-t border-gray-100 dark:border-gray-800">
+                                    <button type="submit"
+                                        class="w-full text-center text-sm font-bold text-red-500 hover:text-red-600 transition-colors py-2">
+                                        Clear Session History
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Recent Threats -->
+                        <div class="lg:col-span-2 flex flex-col gap-4">
+                            <h2 class="text-lg font-bold text-[#111418] dark:text-white">Recent Threats</h2>
+                            {% if recent_threats %}
+                            <div
+                                class="bg-white dark:bg-gray-900 rounded-2xl border border-[#dbe0e6] dark:border-gray-800 overflow-hidden">
+                                {% for entry in recent_threats %}
+                                {% set analysis = entry.analysis %}
+                                <div
+                                    class="p-4 border-b border-[#dbe0e6] dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-between gap-4">
+                                    <div class="flex items-center gap-4 overflow-hidden">
+                                        <div
+                                            class="size-10 bg-red-100 dark:bg-red-900/30 text-red-600 rounded-lg flex items-center justify-center shrink-0">
+                                            <span class="material-symbols-outlined">warning</span>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="font-bold text-[#111418] dark:text-white truncate">{{
+                                                entry.input_text_value }}</p>
+                                            <p class="text-xs text-red-500 font-medium uppercase tracking-wide">
+                                                {% if analysis.kind == 'url' %} {{ analysis.url.risk_level }} Risk URL
+                                                {% elif analysis.kind == 'domain' %} {{ analysis.domain_risk.verdict }}
+                                                Domain
+                                                {% else %} Threat Detected {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <a href="{{ url_for('result', scan_id=entry.scan_id) }}"
+                                        class="text-sm font-medium text-primary hover:text-primary/80 whitespace-nowrap">View
+                                        Report</a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div
+                                class="bg-white dark:bg-gray-900 rounded-2xl border border-[#dbe0e6] dark:border-gray-800 p-8 flex flex-col items-center justify-center text-center gap-4">
+                                <div
+                                    class="size-16 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-full flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-3xl">verified_user</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-[#111418] dark:text-white">Clean Session</h3>
+                                    <p class="text-[#617589] dark:text-gray-400">No threats detected in your recent
+                                        activity.</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+
+            <footer
+                class="bg-white dark:bg-background-dark border-t border-[#dbe0e6] dark:border-gray-800 px-6 md:px-40 py-10 mt-10">
+                <div class="max-w-[960px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">shield_lock</span>
+                        <span class="font-bold text-[#111418] dark:text-white">SentraShield</span>
+                    </div>
+                    <p class="text-xs text-[#617589] dark:text-gray-500">© 2026 SentraShield Inc.</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script>
+        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        var themeToggleBtn = document.getElementById('theme-toggle');
+
+        if(themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', function() {
+                themeToggleDarkIcon.classList.toggle('hidden');
+                themeToggleLightIcon.classList.toggle('hidden');
+
+                if (localStorage.getItem('color-theme')) {
+                    if (localStorage.getItem('color-theme') === 'light') {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('color-theme', 'dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('color-theme', 'light');
+                    }
+                } else {
+                    if (document.documentElement.classList.contains('dark')) {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('color-theme', 'light');
+                    } else {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('color-theme', 'dark');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

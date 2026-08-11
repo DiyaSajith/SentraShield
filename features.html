@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <script>
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Features - SentraShield</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Custom Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        .delay-100 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-200 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+
+        /* Hover effects */
+        .hover-lift {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-[#111418] dark:text-white transition-colors duration-300">
+    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+        <div class="layout-container flex h-full grow flex-col">
+            <!-- Navigation Header -->
+            <header
+                class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#dbe0e6] dark:border-gray-800 px-6 md:px-20 lg:px-40 py-4 bg-white dark:bg-background-dark sticky top-0 z-50">
+                <div class="flex items-center gap-3 text-[#111418] dark:text-white">
+                    <a href="{{ url_for('index') }}" class="flex items-center gap-3">
+                        <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+                            <span class="material-symbols-outlined">shield_lock</span>
+                        </div>
+                        <h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">SentraShield</h2>
+                    </a>
+                </div>
+                <div class="flex flex-1 justify-end gap-8 items-center">
+                    <div class="hidden md:flex items-center gap-8">
+                        <a class="text-sm font-medium hover:text-primary transition-colors"
+                            href="{{ url_for('dashboard') }}">Dashboard</a>
+                        <a class="text-sm font-medium hover:text-primary transition-colors text-primary"
+                            href="{{ url_for('features') }}">Features</a>
+                        <a class="text-sm font-medium hover:text-primary transition-colors"
+                            href="{{ url_for('how_it_works') }}">How it Works</a>
+                    </div>
+                    <button id="theme-toggle" type="button" class="text-[#617589] dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 flex items-center justify-center">
+                        <span id="theme-toggle-dark-icon" class="hidden material-symbols-outlined">dark_mode</span>
+                        <span id="theme-toggle-light-icon" class="hidden material-symbols-outlined">light_mode</span>
+                    </button>
+                </div>
+            </header>
+
+            <main class="flex-1">
+                <!-- Hero Section -->
+                <div
+                    class="px-4 md:px-20 lg:px-40 py-12 flex justify-center bg-white dark:bg-gray-900 border-b border-[#dbe0e6] dark:border-gray-800">
+                    <div
+                        class="layout-content-container flex flex-col max-w-[960px] flex-1 text-center gap-6 animate-slide-up">
+                        <div
+                            class="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider mx-auto">
+                            Powerful Capabilities
+                        </div>
+                        <h1
+                            class="text-[#111418] dark:text-white text-4xl md:text-5xl font-black leading-tight tracking-[-0.033em]">
+                            Comprehensive security analysis
+                        </h1>
+                        <p class="text-[#617589] dark:text-gray-400 text-lg max-w-2xl mx-auto">
+                            Our multi-layered approach combines traditional threat intelligence with advanced AI to
+                            detect even the most sophisticated attacks.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Features Grid -->
+                <div class="px-4 md:px-20 lg:px-40 py-16 flex justify-center">
+                    <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                            <!-- Feature 1 -->
+                            <div
+                                class="flex flex-col gap-4 p-6 rounded-2xl bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 hover-lift animate-slide-up delay-100">
+                                <div
+                                    class="size-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-xl flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-2xl">link</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-[#111418] dark:text-white">URL & Domain Analysis</h3>
+                                <p class="text-[#617589] dark:text-gray-400 leading-relaxed">
+                                    Real-time scanning of URLs against 90+ antivirus engines via VirusTotal. detection
+                                    of malicious domains, phishing sites, and malware distribution points.
+                                </p>
+                            </div>
+
+                            <!-- Feature 2 -->
+                            <div
+                                class="flex flex-col gap-4 p-6 rounded-2xl bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 hover-lift animate-slide-up delay-200">
+                                <div
+                                    class="size-12 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-xl flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-2xl">psychology</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-[#111418] dark:text-white">AI-Powered Risk Assessment
+                                </h3>
+                                <p class="text-[#617589] dark:text-gray-400 leading-relaxed">
+                                    LLM-driven analysis of page content and context. Our AI explains *why* a site is
+                                    dangerous in plain English, going beyond simple "safe/unsafe" labels.
+                                </p>
+                            </div>
+
+                            <!-- Feature 3 -->
+                            <div
+                                class="flex flex-col gap-4 p-6 rounded-2xl bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 hover-lift animate-slide-up delay-100">
+                                <div
+                                    class="size-12 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-xl flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-2xl">chat</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-[#111418] dark:text-white">Message & Text Analysis
+                                </h3>
+                                <p class="text-[#617589] dark:text-gray-400 leading-relaxed">
+                                    Paste suspicious SMS, emails, or chat logs. We identify social engineering tactics,
+                                    urgency cues, and request-for-action patterns typical of scams.
+                                </p>
+                            </div>
+
+                            <!-- Feature 4 -->
+                            <div
+                                class="flex flex-col gap-4 p-6 rounded-2xl bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 hover-lift animate-slide-up delay-200">
+                                <div
+                                    class="size-12 bg-orange-100 dark:bg-orange-900/30 text-orange-600 rounded-xl flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-2xl">qr_code_scanner</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-[#111418] dark:text-white">Image & QR Scanning</h3>
+                                <p class="text-[#617589] dark:text-gray-400 leading-relaxed">
+                                    Upload screenshots or photos of QR codes. We extract text and URLs from images using
+                                    OCR and decode QR codes to reveal hidden destinations safely.
+                                </p>
+                            </div>
+
+                            <!-- Feature 5 -->
+                            <div
+                                class="flex flex-col gap-4 p-6 rounded-2xl bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 hover-lift animate-slide-up delay-100">
+                                <div
+                                    class="size-12 bg-red-100 dark:bg-red-900/30 text-red-600 rounded-xl flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-2xl">call</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-[#111418] dark:text-white">Phone Number Lookup</h3>
+                                <p class="text-[#617589] dark:text-gray-400 leading-relaxed">
+                                    Investigate unknown callers. We search for reports of spam, fraud, or business
+                                    impersonation associated with phone numbers.
+                                </p>
+                            </div>
+
+                            <!-- Feature 6 -->
+                            <div
+                                class="flex flex-col gap-4 p-6 rounded-2xl bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 hover-lift animate-slide-up delay-200">
+                                <div
+                                    class="size-12 bg-teal-100 dark:bg-teal-900/30 text-teal-600 rounded-xl flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-2xl">history</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-[#111418] dark:text-white">Session History</h3>
+                                <p class="text-[#617589] dark:text-gray-400 leading-relaxed">
+                                    Keep track of your recent scans during your session. Easily revisit analysis results
+                                    or clear your history for privacy.
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CTA Section -->
+                <div class="px-4 md:px-20 lg:px-40 py-12 flex justify-center bg-primary/5">
+                    <div class="layout-content-container flex flex-col items-center max-w-[720px] text-center gap-6">
+                        <h2 class="text-[#111418] dark:text-white text-3xl font-bold">Ready to check a threat?</h2>
+                        <a href="{{ url_for('index') }}"
+                            class="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl px-8 py-4 transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-primary/20">
+                            <span class="material-symbols-outlined text-sm">bolt</span>
+                            Analyze Now
+                        </a>
+                    </div>
+                </div>
+
+            </main>
+
+            <footer
+                class="bg-white dark:bg-background-dark border-t border-[#dbe0e6] dark:border-gray-800 px-6 md:px-40 py-10 mt-10">
+                <div class="max-w-[960px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">shield_lock</span>
+                        <span class="font-bold text-[#111418] dark:text-white">SentraShield</span>
+                    </div>
+                    <p class="text-xs text-[#617589] dark:text-gray-500">© 2026 SentraShield Inc.</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script>
+        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        var themeToggleBtn = document.getElementById('theme-toggle');
+
+        if(themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', function() {
+                themeToggleDarkIcon.classList.toggle('hidden');
+                themeToggleLightIcon.classList.toggle('hidden');
+
+                if (localStorage.getItem('color-theme')) {
+                    if (localStorage.getItem('color-theme') === 'light') {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('color-theme', 'dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('color-theme', 'light');
+                    }
+                } else {
+                    if (document.documentElement.classList.contains('dark')) {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('color-theme', 'light');
+                    } else {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('color-theme', 'dark');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

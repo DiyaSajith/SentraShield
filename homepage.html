@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <script>
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>SentraShield - Cybersecurity Analyzer</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Custom Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            /* meaningful initial state */
+        }
+
+        .animate-scale-in {
+            animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        .delay-100 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-200 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+
+        .delay-400 {
+            animation-delay: 0.4s;
+        }
+
+        .delay-500 {
+            animation-delay: 0.5s;
+        }
+
+        /* Hover effects */
+        .hover-lift {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-[#111418] dark:text-white transition-colors duration-300">
+    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+        <div class="layout-container flex h-full grow flex-col">
+            <!-- Navigation Header -->
+            <header
+                class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#dbe0e6] dark:border-gray-800 px-6 md:px-20 lg:px-40 py-4 bg-white dark:bg-background-dark sticky top-0 z-50">
+                <div class="flex items-center gap-3 text-[#111418] dark:text-white">
+                    <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+                        <span class="material-symbols-outlined">shield_lock</span>
+                    </div>
+                    <h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">SentraShield</h2>
+                </div>
+                <div class="flex flex-1 justify-end gap-8 items-center">
+                    <div class="hidden md:flex items-center gap-8">
+                        <a class="text-sm font-medium hover:text-primary transition-colors"
+                            href="{{ url_for('dashboard') }}">Dashboard</a>
+                        <a class="text-sm font-medium hover:text-primary transition-colors"
+                            href="{{ url_for('features') }}">Features</a>
+                        <a class="text-sm font-medium hover:text-primary transition-colors"
+                            href="{{ url_for('how_it_works') }}">How it Works</a>
+                    </div>
+                    <button id="theme-toggle" type="button" class="text-[#617589] dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5 flex items-center justify-center">
+                        <span id="theme-toggle-dark-icon" class="hidden material-symbols-outlined">dark_mode</span>
+                        <span id="theme-toggle-light-icon" class="hidden material-symbols-outlined">light_mode</span>
+                    </button>
+                </div>
+            </header>
+            <main class="flex-1">
+                <!-- Hero Section -->
+                <div class="px-4 md:px-20 lg:px-40 py-12 flex justify-center">
+                    <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+                        <div class="@container">
+                            <div class="@[480px]:p-0">
+                                <div
+                                    class="flex min-h-[420px] flex-col gap-8 items-center justify-center p-8 rounded-3xl bg-white dark:bg-gray-900 border border-[#dbe0e6] dark:border-gray-800 shadow-sm relative overflow-hidden">
+                                    <!-- Background Decoration -->
+                                    <div class="absolute top-0 right-0 p-10 opacity-10 pointer-events-none">
+                                        <span
+                                            class="material-symbols-outlined text-[120px] text-primary">gpp_maybe</span>
+                                    </div>
+                                    <div class="flex flex-col gap-4 text-center z-10 animate-slide-up">
+                                        <h1
+                                            class="text-[#111418] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl drop-shadow-sm">
+                                            Stay safe online with AI analysis
+                                        </h1>
+                                        <h2
+                                            class="text-[#617589] dark:text-gray-400 text-base font-normal max-w-2xl mx-auto @[480px]:text-lg delay-100 animate-slide-up">
+                                            Instant protection from scams and phishing. Paste a link, message, or upload
+                                            an image to check for threats in real-time.
+                                        </h2>
+                                    </div>
+                                    <!-- Main Input Area -->
+                                    <div class="w-full max-w-[720px] z-10 animate-scale-in delay-200">
+                                        <form id="analyze-form" method="post" enctype="multipart/form-data"
+                                            class="flex flex-col gap-3 p-4 bg-background-light dark:bg-gray-800 rounded-2xl border border-[#dbe0e6] dark:border-gray-700 shadow-md hover:shadow-lg transition-shadow duration-300">
+                                            <div class="flex flex-col md:flex-row gap-2">
+                                                <div
+                                                    class="flex-1 flex items-center bg-white dark:bg-gray-900 rounded-xl border border-[#dbe0e6] dark:border-gray-700 overflow-hidden px-4 focus-within:ring-2 ring-primary/20 transition-all">
+                                                    <span
+                                                        class="material-symbols-outlined text-gray-400 mr-2">search</span>
+                                                    <input name="input_text" value="{{ input_text_value }}"
+                                                        class="w-full py-4 text-[#111418] dark:text-white bg-transparent border-none focus:ring-0 placeholder:text-[#617589] text-sm md:text-base"
+                                                        placeholder="Paste URL, text, or phone number..." />
+                                                </div>
+                                                <button type="submit"
+                                                    class="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl px-8 py-4 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-primary/20">
+                                                    <span class="material-symbols-outlined text-sm">bolt</span>
+                                                    Analyze Now
+                                                </button>
+                                            </div>
+                                            <div class="flex items-center justify-between px-2">
+                                                <div class="flex gap-4">
+                                                    <button type="button" id="scan-image-button"
+                                                        class="flex items-center gap-1.5 text-xs font-semibold text-[#617589] dark:text-gray-400 hover:text-primary transition-colors">
+                                                        <span class="material-symbols-outlined text-lg">image</span>
+                                                        Scan Image
+                                                    </button>
+                                                    <input id="image-file-input" name="image_file" type="file"
+                                                        accept="image/*" class="hidden" />
+                                                </div>
+                                                <span
+                                                    class="text-[10px] text-[#617589] dark:text-gray-500 font-medium italic">Powered
+                                                    by SentraShield Engine</span>
+                                            </div>
+                                            {% if image_error %}
+                                            <p class="text-xs text-red-500 px-2">{{ image_error }}</p>
+                                            {% endif %}
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Features Section -->
+                <div class="px-4 md:px-20 lg:px-40 py-10 flex justify-center bg-white dark:bg-background-dark/50">
+                    <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+                        <div class="flex flex-col gap-10 px-4 py-10 @container">
+                            <div class="flex flex-col gap-4">
+                                <h2
+                                    class="text-[#111418] dark:text-white tracking-light text-[28px] md:text-[32px] font-bold leading-tight">
+                                    How it works
+                                </h2>
+                                <p class="text-[#617589] dark:text-gray-400 text-base font-normal max-w-[720px]">
+                                    Our advanced AI model cross-references your data against millions of known threats
+                                    and analyzes behavioral patterns to keep you safe.
+                                </p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div
+                                    class="flex flex-1 gap-4 rounded-2xl border border-[#dbe0e6] dark:border-gray-800 bg-white dark:bg-gray-900 p-6 flex-col hover-lift animate-slide-up delay-300">
+                                    <div
+                                        class="text-primary bg-primary/10 size-12 rounded-xl flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-2xl">link</span>
+                                    </div>
+                                    <div class="flex flex-col gap-2">
+                                        <h3 class="text-[#111418] dark:text-white text-lg font-bold">Link Checking</h3>
+                                        <p class="text-[#617589] dark:text-gray-400 text-sm leading-relaxed">
+                                            Instant analysis of URLs to detect phishing sites, malicious redirects, and
+                                            credential harvesters.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div
+                                    class="flex flex-1 gap-4 rounded-2xl border border-[#dbe0e6] dark:border-gray-800 bg-white dark:bg-gray-900 p-6 flex-col hover-lift animate-slide-up delay-400">
+                                    <div
+                                        class="text-primary bg-primary/10 size-12 rounded-xl flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-2xl">chat</span>
+                                    </div>
+                                    <div class="flex flex-col gap-2">
+                                        <h3 class="text-[#111418] dark:text-white text-lg font-bold">Message
+                                            Verification</h3>
+                                        <p class="text-[#617589] dark:text-gray-400 text-sm leading-relaxed">
+                                            Check suspicious SMS or chat messages for social engineering tactics and
+                                            urgent scam lures.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div
+                                    class="flex flex-1 gap-4 rounded-2xl border border-[#dbe0e6] dark:border-gray-800 bg-white dark:bg-gray-900 p-6 flex-col hover-lift animate-slide-up delay-500">
+                                    <div
+                                        class="text-primary bg-primary/10 size-12 rounded-xl flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-2xl">file_present</span>
+                                    </div>
+                                    <div class="flex flex-col gap-2">
+                                        <h3 class="text-[#111418] dark:text-white text-lg font-bold">File &amp; Image
+                                            Safety</h3>
+                                        <p class="text-[#617589] dark:text-gray-400 text-sm leading-relaxed">
+                                            Scan screenshots of suspicious messages or documents for hidden malware and
+                                            threat indicators.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Global Scans Section -->
+                <div class="px-4 md:px-20 lg:px-40 py-12 flex justify-center">
+                    <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+                        <div class="flex items-center justify-between px-4 pb-6">
+                            <h3 class="text-[#111418] dark:text-white text-xl font-bold">Recent Activity</h3>
+                            <div class="flex items-center gap-4">
+                                {% if recent_analyses %}
+                                <form action="{{ url_for('clear_history') }}" method="post"
+                                    onsubmit="return confirm('Are you sure you want to clear scan history?');">
+                                    <button type="submit"
+                                        class="text-xs font-bold text-red-500 hover:text-red-600 transition-colors uppercase tracking-wider">
+                                        Clear History
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <div class="flex items-center gap-2 text-primary font-semibold text-sm">
+                                    <span class="size-2 bg-green-500 rounded-full animate-pulse"></span>
+                                    Live Updates
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid gap-4 px-4">
+                            {% if recent_analyses %}
+                            {% for entry in recent_analyses %}
+                            {% set analysis = entry.analysis %}
+                            {% set scan_id = entry.scan_id %}
+                            {% set created_at = entry.created_at %}
+
+                            <a href="{{ url_for('result', scan_id=scan_id) }}"
+                                class="block hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors rounded-xl">
+                                <div
+                                    class="flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-xl border border-[#dbe0e6] dark:border-gray-800">
+                                    <div class="flex items-center gap-4">
+                                        {% set risk_label = (
+                                        (analysis.domain_risk.verdict if analysis.domain_risk and
+                                        analysis.domain_risk.verdict else None)
+                                        or (analysis.url.risk_level if analysis.url and analysis.url.risk_level else
+                                        None)
+                                        or (analysis.email.overall_risk if analysis.email and
+                                        analysis.email.overall_risk else None)
+                                        or (analysis.message.overall_risk if analysis.message and
+                                        analysis.message.overall_risk else None)
+                                        or (analysis.phone.risk_level if analysis.phone and analysis.phone.risk_level
+                                        else None)
+                                        ) %}
+
+                                        {% if risk_label in ['malicious', 'High', 'suspicious'] %}
+                                        <div class="bg-red-100 dark:bg-red-900/30 text-red-600 p-2 rounded-lg">
+                                            <span class="material-symbols-outlined text-xl">warning</span>
+                                        </div>
+                                        {% elif risk_label in ['safe', 'Low', 'trusted'] %}
+                                        <div class="bg-green-100 dark:bg-green-900/30 text-green-600 p-2 rounded-lg">
+                                            <span class="material-symbols-outlined text-xl">verified_user</span>
+                                        </div>
+                                        {% else %}
+                                        <div class="bg-gray-100 dark:bg-gray-800 text-gray-600 p-2 rounded-lg">
+                                            <span class="material-symbols-outlined text-xl">info</span>
+                                        </div>
+                                        {% endif %}
+
+                                        <div>
+                                            <p class="text-sm font-bold text-[#111418] dark:text-white">
+                                                {% if analysis.kind == 'url' %} URL Scan
+                                                {% elif analysis.kind == 'domain' %} Domain Scan
+                                                {% elif analysis.kind == 'email' %} Email Analysis
+                                                {% elif analysis.kind == 'phone' %} Phone Lookup
+                                                {% else %} Text Analysis {% endif %}
+                                            </p>
+                                            <p
+                                                class="text-xs text-[#617589] dark:text-gray-400 truncate max-w-[200px] md:max-w-[300px]">
+                                                {{ entry.input_text_value }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-medium text-[#617589] dark:text-gray-500">View
+                                        Result</span>
+                                </div>
+                            </a>
+                            {% endfor %}
+                            {% else %}
+                            <div class="text-center py-8">
+                                <p class="text-[#617589] dark:text-gray-400 text-sm">No recent scans. Analyze something
+                                    to see it here.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <!-- Footer -->
+            <footer
+                class="bg-white dark:bg-background-dark border-t border-[#dbe0e6] dark:border-gray-800 px-6 md:px-40 py-10 mt-10">
+                <div class="max-w-[960px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">shield_lock</span>
+                        <span class="font-bold text-[#111418] dark:text-white">SentraShield</span>
+                    </div>
+                    <p class="text-xs text-[#617589] dark:text-gray-500">© 2026 SentraShield Inc.</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay"
+        class="fixed inset-0 bg-white/80 dark:bg-[#101922]/90 backdrop-blur-sm z-50 hidden flex-col items-center justify-center transition-opacity duration-300">
+        <div class="relative flex flex-col items-center gap-6 p-8 rounded-3xl animate-scale-in">
+            <!-- Spinner -->
+            <div class="relative size-24">
+                <div class="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-gray-800"></div>
+                <div class="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin">
+                </div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-4xl text-primary animate-pulse">shield_lock</span>
+                </div>
+            </div>
+            <!-- Text -->
+            <div class="text-center space-y-2">
+                <h3 id="loading-title" class="text-2xl font-bold text-[#111418] dark:text-white">Analyzing...</h3>
+                <p id="loading-subtitle" class="text-[#617589] dark:text-gray-400 text-sm">Please wait while
+                    SentraShield checks for threats.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const scanButton = document.getElementById("scan-image-button");
+        const imageInput = document.getElementById("image-file-input");
+        const form = document.getElementById("analyze-form");
+        const loadingOverlay = document.getElementById("loading-overlay");
+        const loadingTitle = document.getElementById("loading-title");
+        const loadingSubtitle = document.getElementById("loading-subtitle");
+
+        function showLoading(type) {
+            loadingOverlay.classList.remove("hidden");
+            loadingOverlay.classList.add("flex");
+
+            // Dynamic Text based on input type
+            switch (type) {
+                case 'url':
+                    loadingTitle.innerText = "🚀 Scanning URL";
+                    loadingSubtitle.innerText = "Checking against malware databases & phishing logs...";
+                    break;
+                case 'email':
+                    loadingTitle.innerText = "📧 Analyzing Email";
+                    loadingSubtitle.innerText = "Verifying sender reputation & DMARC records...";
+                    break;
+                case 'phone':
+                    loadingTitle.innerText = "📞 Looking up Phone";
+                    loadingSubtitle.innerText = "Searching global spam registries...";
+                    break;
+                case 'image':
+                    loadingTitle.innerText = "🖼️ Processing Image";
+                    loadingSubtitle.innerText = "Extracting text and scanning for hidden threats...";
+                    break;
+                default:
+                    loadingTitle.innerText = "🧠 AI Analysis";
+                    loadingSubtitle.innerText = "SentraShield AI is analyzing the content...";
+            }
+        }
+
+        if (scanButton && imageInput && form) {
+            scanButton.addEventListener("click", function () {
+                imageInput.click();
+            });
+
+            imageInput.addEventListener("change", function () {
+                if (imageInput.files && imageInput.files.length > 0) {
+                    showLoading('image');
+                    form.submit();
+                }
+            });
+
+            form.addEventListener("submit", function (e) {
+                const inputVal = form.querySelector('input[name="input_text"]').value.trim();
+                let type = 'text';
+
+                if (inputVal.match(/^(http|www\.)/i)) type = 'url';
+                else if (inputVal.match(/@/)) type = 'email';
+                else if (inputVal.match(/^[\d\+\-\(\)\s]{7,}$/)) type = 'phone';
+
+                showLoading(type);
+            });
+        }
+    </script>
+    <script>
+        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        var themeToggleBtn = document.getElementById('theme-toggle');
+
+        if(themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', function() {
+                themeToggleDarkIcon.classList.toggle('hidden');
+                themeToggleLightIcon.classList.toggle('hidden');
+
+                if (localStorage.getItem('color-theme')) {
+                    if (localStorage.getItem('color-theme') === 'light') {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('color-theme', 'dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('color-theme', 'light');
+                    }
+                } else {
+                    if (document.documentElement.classList.contains('dark')) {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('color-theme', 'light');
+                    } else {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('color-theme', 'dark');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

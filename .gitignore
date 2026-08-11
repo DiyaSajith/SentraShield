@@ -94,6 +94,10 @@ venv.bak/
 .vscode/
 .idea/
 
-# OS metadata
+# OS metadata & media
 .DS_Store
 Thumbs.db
+*.png
+*.jpg
+*.jpeg
+
